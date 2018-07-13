@@ -36,5 +36,7 @@ def get_eprints_articles_from_journal(url):
     json_content = requests.get(url).json()
 
     for article in json_content:
-        print(article)
+        article_list.append({'title': article.get('title'), 'url': article.get('official_url')})
+
+    return article_list
 

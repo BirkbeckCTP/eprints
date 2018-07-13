@@ -54,7 +54,8 @@
                 data: {'url': url},
                 success: function (result) {
                     if (result.status === 200) {
-                        $("#" + id).html(result.html);
+                        console.log(result.html)
+                        $("#" + id).append(result.html);
                     } else {
                         alert('There was an error retrieving issue data.')
                     }

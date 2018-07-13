@@ -63,6 +63,8 @@ def fetch_eprints_articles(request, import_id):
 
         articles = logic.get_eprints_articles_from_journal(url)
 
-        return HttpResponse(json.dumps({'status': 200}))
+        html = render_to_string('eprints/article_list.html', {'articles': articles})
+
+        return HttpResponse(json.dumps({'status': 200, 'html': html}))
 
 
