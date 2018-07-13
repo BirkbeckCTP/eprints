@@ -2,4 +2,14 @@
     <li>
         {{ article.title }} - <a href="{{ article.url }}">{{ article.url }}</a>
     </li>
+
 {% endfor %}
+
+<li>
+    <form method="POST">
+        {% csrf_token %}
+        <input name="url" value="{{ url }}" type="hidden">
+        <button name="import_as_articles" class="success button">Import as Articles</button>
+        <button name="import_as_remote" class="warning button">Import as Remote Articles</button>
+    </form>
+</li>

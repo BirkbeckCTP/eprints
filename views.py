@@ -56,14 +56,14 @@ def fetch_eprints_issues(request, import_id):
 
 
 def fetch_eprints_articles(request, import_id):
-    import_obj = get_object_or_404(models.Import, pk=import_id)
+    get_object_or_404(models.Import, pk=import_id)
 
     if request.POST:
         url = request.POST.get('url')
 
-        articles = logic.get_eprints_articles_from_journal(url)
+        articles, json_url = logic.get_eprints_articles_from_journal(url)
 
-        html = render_to_string('eprints/article_list.html', {'articles': articles})
+        html = render_to_string('eprints/article_list.html', {'articles': articles, 'url': json_url})
 
         return HttpResponse(json.dumps({'status': 200, 'html': html}))
 
