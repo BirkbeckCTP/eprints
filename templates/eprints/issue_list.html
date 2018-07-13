@@ -1,0 +1,5 @@
+<ul>
+    {% for issue in issues %}
+        <li id="{{ forloop.counter }}-element">{{ issue.text }}<ul><li> <button class="tiny button" onclick="fetchArticles('{{ forloop.counter }}-element','{{ issue.href }}')">Fetch Articles</button></li></ul></li>
+    {% endfor %}
+</ul>

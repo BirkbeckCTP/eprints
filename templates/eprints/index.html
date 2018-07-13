@@ -1,0 +1,26 @@
+{% extends "admin/core/base.html" %}
+{% load foundation %}
+
+{% block page_title %}eprints Admin{% endblock page_title %}
+{% block title %}eprints Admin{% endblock %}
+
+{% block body %}
+    <div class="box">
+        <div class="content">
+            <div class="row expanded">
+                <div class="large-6 columns">
+                    <p>Enter the homepage URL of your eprints journal eg. http://eprints.institution.ac.uk/journal/code/</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ admin_form|foundation }}
+                        <div class="row">
+                            <div class="large-12 columns">
+                                <button class="button success" type="submit">Process</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
