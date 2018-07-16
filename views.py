@@ -34,6 +34,9 @@ def index(request):
 def import_journal(request, import_id):
     import_obj = get_object_or_404(models.Import, pk=import_id)
 
+    if request.POST and 'url' in request.POST:
+        logic.import_articles_to_journal(request)
+
     template = 'eprints/import.html'
     context = {
         'import': import_obj,
