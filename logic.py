@@ -1,4 +1,5 @@
 import requests
+import re
 from bs4 import BeautifulSoup
 
 from django.utils.text import capfirst
@@ -14,7 +15,7 @@ def get_eprints_issues_from_journal(import_obj):
     content = requests.get(import_obj.url)
     soup = BeautifulSoup(content.text, "lxml")
     issues = soup.findAll("li", {"class": "journalIssue"})
-    
+
     for issue in issues:
         issue_list.append({'href': issue.a.get('href'), 'text': issue.a.string})
 
@@ -53,7 +54,10 @@ def import_articles_to_journal(request):
 
     for article in json_content:
 
-        section, created = models.Section.objects.language('en').get_or_create(journal=request.journal, name=capfirst(article.get('type')))
+        section, created = models.Section.objects.language('en').get_or_create(
+            journal=request.journal,
+            name=capfirst(article.get('type'))
+        )
 
         new_article = models.Article.objects.create(
             journal=request.journal,
@@ -78,3 +82,17 @@ def import_articles_to_journal(request):
         )
 
         issue.articles.add(new_article)
+
+
+def check_if_issue_exists(issue, request):
+    numbers = re.findall(r'\d+', issue.get('text'))
+    print(numbers)
+
+    try:
+        issue_obj = journal_models.Issue.objects.get(
+            issue=numbers[1],
+            volume=numbers[0],
+            journal=request.journal)
+        return issue_obj
+    except journal_models.Issue.DoesNotExist:
+        return False

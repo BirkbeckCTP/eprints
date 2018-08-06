@@ -49,7 +49,9 @@ def fetch_eprints_issues(request, import_id):
     import_obj = get_object_or_404(models.Import, pk=import_id)
 
     issues = logic.get_eprints_issues_from_journal(import_obj)
-    
+    for issue in issues:
+        issue['exists'] = logic.check_if_issue_exists(issue, request)
+
     context = {'issues': issues}
 
     html = render_to_string('eprints/issue_list.html', context)
@@ -68,5 +70,3 @@ def fetch_eprints_articles(request, import_id):
         html = render_to_string('eprints/article_list.html', {'articles': articles, 'url': json_url}, request=request)
 
         return HttpResponse(json.dumps({'status': 200, 'html': html}))
-
-
