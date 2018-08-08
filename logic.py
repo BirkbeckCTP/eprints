@@ -86,7 +86,6 @@ def import_articles_to_journal(request):
 
 def check_if_issue_exists(issue, request):
     numbers = re.findall(r'\d+', issue.get('text'))
-    print(numbers)
 
     try:
         issue_obj = journal_models.Issue.objects.get(
