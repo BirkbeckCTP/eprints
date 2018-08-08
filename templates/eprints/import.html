@@ -46,7 +46,8 @@
             });
         };
 
-        function fetchArticles(id, url) {
+        function fetchArticles(id, url, holder) {
+            $("#" + holder).html('  <i class="fa fa-circle-o-notch fa-spin"></i>')
             $.ajax({
                 type: 'POST',
                 url: "{% url 'eprints_fetch_articles' import.pk %}",
@@ -56,6 +57,7 @@
                     if (result.status === 200) {
                         console.log(result.html)
                         $("#" + id).append(result.html);
+                        $("#" + holder).html('  <i class="fa fa-check"></i>')
                     } else {
                         alert('There was an error retrieving issue data.')
                     }
