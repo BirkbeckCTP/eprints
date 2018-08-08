@@ -11,7 +11,7 @@ def index(request):
     """
     Render admin page allowing users to enable or disable the plugin
     """
-    plugin = util_models.Plugin.objects.get(name=plugin_settings.SHORT_NAME)
+    util_models.Plugin.objects.get(name=plugin_settings.SHORT_NAME)
     admin_form = forms.EprintsAdminForm()
 
     if request.POST:
