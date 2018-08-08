@@ -69,7 +69,7 @@ def import_articles_to_journal(request):
             is_import=True if import_as_remote else False,
             section=section,
             stage=models.STAGE_PUBLISHED,
-            date_published=article.get('rioxx2_publication_date'),
+            date_published=article.get('datestamp'),
             peer_reviewed=True if article.get('refereed') == 'TRUE' else False
         )
 
@@ -85,8 +85,8 @@ def import_articles_to_journal(request):
 
 
 def check_if_issue_exists(issue, request):
-    numbers = re.findall(r'\d+', issue.get('text'))
-
+    numbers = re.findall(r'\d+', issue.get('text')
+)
     try:
         issue_obj = journal_models.Issue.objects.get(
             issue=numbers[1],
