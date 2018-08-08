@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from submission import models
 from journal import models as journal_models
+from utils.importers.up import attempt_to_make_timezone_aware
 
 
 def get_eprints_issues_from_journal(import_obj):
@@ -69,7 +70,7 @@ def import_articles_to_journal(request):
             is_import=True if import_as_remote else False,
             section=section,
             stage=models.STAGE_PUBLISHED,
-            date_published=article.get('datestamp'),
+            date_published=attempt_to_make_timezone_aware(article.get('datestamp')),
             peer_reviewed=True if article.get('refereed') == 'TRUE' else False
         )
 
