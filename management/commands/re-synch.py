@@ -132,8 +132,11 @@ class Command(BaseCommand):
                             article.pk,
                     )
                 else:
-                    saved_file = files.save_file_to_article(
-                            file_, article, owner=None, is_galley=True)
+                    saved_file = files.save_file_to_article(file_, article,
+                            owner=None,
+                            label="pdf",
+                            is_galley=True,
+                    )
                     galley = Galley.objects.create(
                             article=article,
                             file=saved_file,
