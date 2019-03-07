@@ -97,6 +97,8 @@ class Command(BaseCommand):
                 author.last_name = last_name
                 author.middle_name = middle_name or None
                 author.save()
+                #create frozen author record for rendering
+                author.snapshot_self(article)
 
                 _, created = ImportedArticleAuthor.objects.get_or_create(
                     article=article,
@@ -141,6 +143,7 @@ class Command(BaseCommand):
                             article=article,
                             file=saved_file,
                             type="pdf",
+                            label="pdf",
                     )
                     article.galley_set.add(galley)
 
