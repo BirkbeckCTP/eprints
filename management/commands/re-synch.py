@@ -97,7 +97,7 @@ class Command(BaseCommand):
                 author.last_name = last_name
                 author.middle_name = middle_name or None
                 author.save()
-                #create frozen author record for rendering
+                # create frozen author record for rendering
                 author.snapshot_self(article)
 
                 _, created = ImportedArticleAuthor.objects.get_or_create(
