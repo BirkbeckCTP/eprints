@@ -1,4 +1,6 @@
 import pytz
+import re
+from urllib.parse import urlsplit
 
 from dateutil import parser
 from django.db import transaction
@@ -9,11 +11,12 @@ import requests
 
 from core import files
 from core.models import Account, Galley
-from submission.models import Article, Keyword
-
+from submission.models import Article, Keyword, Licence
+from identifiers.models import Identifier
 from plugins.eprints.models import ImportedArticleAuthor, ImportedArticleGalley
 
 JSON_EXPORT_TMPL = "{url}/cgi/export/{eprints_id}/JSON/{prefix}-eprint-{eprints_id}"
+DOI_RE = re.compile("10.\d{4,9}/[-._;()/:a-zA-Z0-9]+")
 
 
 def get_eprints_id(url):
@@ -75,6 +78,7 @@ class Command(BaseCommand):
 
                 self.sync_galleys(article, metadata)
                 self.sync_metadata(article, metadata)
+                self.sync_doi(article, metadata)
                 article.is_remote = False
                 article.save()
 
@@ -159,6 +163,26 @@ class Command(BaseCommand):
     def sync_metadata(self, article, metadata):
         if metadata.get("rioxx2_description"):
             article.abstract = metadata["rioxx2_description"]
+
+        if metadata.get("rioxx2_license_ref"):
+            try:
+                license_url = metadata["rioxx2_license_ref"].get("license_ref") 
+                article.license = Licence.objects.get(
+                        journal=article.journal,
+                        url=license_url,
+                )
+            except Licence.DoesNotExist:
+                try:
+                    split = urlsplit(license_url)
+                    split = split._replace(
+                        scheme="https" if split.scheme == "http" else "http")
+                    article.license = Licence.objects.get(
+                            journal=article.journal,
+                            url=split.geturl(),
+                    )
+                except Licence.DoesNotExist:
+                    self.stdout.write("Unknown license %s" % license_url)
+
         if metadata.get("keywords"):
             keywords = metadata["keywords"].split(", ")
             for keyword in keywords:
@@ -171,6 +195,25 @@ class Command(BaseCommand):
             elif date["date_type"] == "published":
                 article.date_published = parser.parse(date["date"]).replace(
                         tzinfo=pytz.UTC)
+
+    def sync_doi(self, article, metadata):
+        try:
+            doi_url = metadata["rioxx2_version_of_record"]
+            doi_str = re.search(DOI_RE, doi_url).group(0)
+        except KeyError:
+            self.stdout.write("No DOI record for article in eprints")
+            return
+        except AttributeError:
+            self.stdout.write("Identifier is not a DOI: %s" % doi_url)
+            return
+
+        doi, created = Identifier.objects.get_or_create(
+            id_type="doi",
+            identifier=doi_str,
+            article=article,
+        )
+        if created:
+            self.stdout.write("Imported DOI %s " % doi)
 
 
 def get_author_details(author_metadata):
