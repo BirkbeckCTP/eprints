@@ -38,6 +38,8 @@ class Command(BaseCommand):
         parser.add_argument('url')
         parser.add_argument('prefix')
         parser.add_argument("--debug", action='store_true', default=False)
+        parser.add_argument("--all", action='store_true', default=False,
+                help="re-syncs articles that are no longer remote")
 
     def handle(self, *args, **options):
         debug = options["debug"]
@@ -54,9 +56,12 @@ class Command(BaseCommand):
 
         url = options["url"]
         prefix = options["prefix"]
+        sync_all = options["all"]
 
 
         remote_articles = Article.objects.filter(remote_url__isnull=False)
+        if not sync_all:
+            remote_articles = remote_articles.filter(is_remote=True)
 
         eprints_articles = (
             article for article in remote_articles
