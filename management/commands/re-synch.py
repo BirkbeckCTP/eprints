@@ -17,6 +17,7 @@ from plugins.eprints.models import ImportedArticleAuthor, ImportedArticleGalley
 
 JSON_EXPORT_TMPL = "{url}/cgi/export/{eprints_id}/JSON/{prefix}-eprint-{eprints_id}"
 DOI_RE = re.compile("10.\d{4,9}/[-._;()/:a-zA-Z0-9]+")
+DOI_BASE_URL = "http://dx.doi.org/"
 
 
 def get_eprints_id(url):
@@ -54,11 +55,13 @@ class Command(BaseCommand):
         url = options["url"]
         prefix = options["prefix"]
 
+
         remote_articles = Article.objects.filter(remote_url__isnull=False)
-        eprints_articles = [
+
+        eprints_articles = (
             article for article in remote_articles
-            if url in article.remote_url
-        ]
+            if is_eprints_article(url, article)
+        )
 
         for article in eprints_articles:
             eprints_id = get_eprints_id(article.remote_url)
@@ -182,6 +185,7 @@ class Command(BaseCommand):
                     )
                 except Licence.DoesNotExist:
                     self.stdout.write("Unknown license %s" % license_url)
+            article.save()
 
         if metadata.get("keywords"):
             keywords = metadata["keywords"].split(", ")
@@ -240,3 +244,16 @@ def validate_response(response):
             "Eprints request failed with code %s",
             response.status_code
         )
+
+def is_eprints_article(eprints_url, article):
+    is_eprints = False
+    if eprints_url in article.remote_url:
+        is_eprints = True
+    elif DOI_BASE_URL in article.remote_url:
+        req = requests.get(article.remote_url)
+        redir = req.history[-1]
+        if eprints_url in redir.url:
+            article.remote_url = redir.url
+            is_eprints = True
+
+    return is_eprints
