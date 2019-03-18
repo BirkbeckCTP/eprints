@@ -58,7 +58,6 @@ class Command(BaseCommand):
         prefix = options["prefix"]
         sync_all = options["all"]
 
-
         remote_articles = Article.objects.filter(remote_url__isnull=False)
         if not sync_all:
             remote_articles = remote_articles.filter(is_remote=True)
@@ -199,14 +198,17 @@ class Command(BaseCommand):
                 article.keywords.add(obj)
         for date in metadata["dates"]:
             if "date_type" not in date:
-                article.date_published = parser.parse(str(date["date"])).replace(
-                        tzinfo=pytz.UTC)
+                article.date_published = parser.parse(
+                        str(date["date"])
+                ).replace(tzinfo=pytz.UTC)
             elif date["date_type"] == "accepted":
-                article.date_accepted = parser.parse(str(date["date"])).replace(
-                        tzinfo=pytz.UTC)
+                article.date_accepted = parser.parse(
+                        str(date["date"])
+                ).replace(tzinfo=pytz.UTC)
             elif date["date_type"] == "published":
-                article.date_published = parser.parse(str(date["date"])).replace(
-                        tzinfo=pytz.UTC)
+                article.date_published = parser.parse(
+                    str(date["date"])
+                ).replace(tzinfo=pytz.UTC)
 
     def sync_doi(self, article, metadata):
         try:
@@ -235,7 +237,7 @@ def get_author_details(author_metadata):
         first_name = names[0]
         middle_name = " ".join(names[1:])
     else:
-        #Corporate authors have "given" set to null
+        # Corporate authors have "given" set to null
         first_name = middle_name = None
     last_name = author_metadata["name"]["family"]
     email = author_metadata.get("id")
@@ -245,11 +247,13 @@ def get_author_details(author_metadata):
 
     return first_name, middle_name, last_name, email
 
+
 def debug_mode():
     import traceback, pdb, sys
     extype, value, tb = sys.exc_info()
     traceback.print_exc()
     pdb.post_mortem(tb)
+
 
 def validate_response(response):
     if response.status_code != 200:
@@ -257,6 +261,7 @@ def validate_response(response):
             "Eprints request failed with code %s",
             response.status_code
         )
+
 
 def is_eprints_article(eprints_url, article):
     is_eprints = False
