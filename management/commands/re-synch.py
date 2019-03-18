@@ -155,7 +155,7 @@ class Command(BaseCommand):
                             article=article,
                             file=saved_file,
                             type="pdf",
-                            label="pdf",
+                            label="PDF",
                     )
                     article.galley_set.add(galley)
 
@@ -198,11 +198,14 @@ class Command(BaseCommand):
                 obj, created = Keyword.objects.get_or_create(word=keyword)
                 article.keywords.add(obj)
         for date in metadata["dates"]:
-            if date["date_type"] == "accepted":
-                article.date_accepted = parser.parse(date["date"]).replace(
+            if "date_type" not in date:
+                article.date_published = parser.parse(str(date["date"])).replace(
+                        tzinfo=pytz.UTC)
+            elif date["date_type"] == "accepted":
+                article.date_accepted = parser.parse(str(date["date"])).replace(
                         tzinfo=pytz.UTC)
             elif date["date_type"] == "published":
-                article.date_published = parser.parse(date["date"]).replace(
+                article.date_published = parser.parse(str(date["date"])).replace(
                         tzinfo=pytz.UTC)
 
     def sync_doi(self, article, metadata):
@@ -226,9 +229,14 @@ class Command(BaseCommand):
 
 
 def get_author_details(author_metadata):
-    names = author_metadata["name"]["given"].replace( ".", " ").split( " ", 1)
-    first_name = names[0]
-    middle_name = " ".join(names[1:])
+    given_name = author_metadata["name"]["given"]
+    if given_name:
+        names = given_name.replace( ".", " ").split( " ", 1)
+        first_name = names[0]
+        middle_name = " ".join(names[1:])
+    else:
+        #Corporate authors have "given" set to null
+        first_name = middle_name = None
     last_name = author_metadata["name"]["family"]
     email = author_metadata.get("id")
     if email is None:
