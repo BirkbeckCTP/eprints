@@ -52,6 +52,7 @@ def import_articles_to_journal(request):
     url = request.POST.get('url')
     import_as_remote = True if 'import_as_remote' in request.POST else False
     json_content = requests.get(url).json()
+    issue_type = journal_models.IssueType.objects.get(code="issue")
 
     for article in json_content:
 
@@ -78,7 +79,7 @@ def import_articles_to_journal(request):
             journal=request.journal,
             issue=article.get('number'),
             volume=article.get('volume'),
-            issue_type='Issue',
+            issue_type=issue_type,
             defaults={'date': timezone.now()}
         )
 
