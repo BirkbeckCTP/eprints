@@ -1,9 +1,10 @@
 PLUGIN_NAME = 'eprints'
 DESCRIPTION = 'Imports Eprints articles.'
 AUTHOR = 'Andy Byers'
-VERSION = '0.1'
+VERSION = '1.1'
 SHORT_NAME = 'eprints'
 MANAGER_URL = 'eprints_index'
+JANEWAY_VERSION = "1.3.6"
 
 from utils import models
 
@@ -15,7 +16,7 @@ def install():
         print('Plugin {0} installed.'.format(PLUGIN_NAME))
     else:
         print('Plugin {0} is already installed.'.format(PLUGIN_NAME))
-        
+
     models.PluginSetting.objects.get_or_create(name='eprints_enabled', plugin=new_plugin, types='boolean',
                                                pretty_name='Enable eprints', description='Enable eprints',
                                                is_translatable=False)
