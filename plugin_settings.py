@@ -1,25 +1,35 @@
+from utils import models, plugins
+from utils.install import update_settings
+
 PLUGIN_NAME = 'eprints'
 DESCRIPTION = 'Imports Eprints articles.'
 AUTHOR = 'Andy Byers'
 VERSION = '1.1'
 SHORT_NAME = 'eprints'
 MANAGER_URL = 'eprints_index'
-JANEWAY_VERSION = "1.3.6"
+JANEWAY_VERSION = "1.3.10"
 
-from utils import models
+
+class EprintsPlugin(plugins.Plugin):
+    plugin_name = PLUGIN_NAME
+    display_name = PLUGIN_NAME
+    description = DESCRIPTION
+    author = AUTHOR
+    short_name = SHORT_NAME
+
+    manager_url = MANAGER_URL
+
+    version = VERSION
+    janeway_version = "1.4.0"
+
+    is_workflow_plugin = False
 
 
 def install():
-    new_plugin, created = models.Plugin.objects.get_or_create(name=SHORT_NAME, version=VERSION, enabled=True)
-
-    if created:
-        print('Plugin {0} installed.'.format(PLUGIN_NAME))
-    else:
-        print('Plugin {0} is already installed.'.format(PLUGIN_NAME))
-
-    models.PluginSetting.objects.get_or_create(name='eprints_enabled', plugin=new_plugin, types='boolean',
-                                               pretty_name='Enable eprints', description='Enable eprints',
-                                               is_translatable=False)
+    EprintsPlugin.install()
+    update_settings(
+        file_path='plugins/eprints/install/settings.json',
+    )
 
 
 def hook_registry():

@@ -56,7 +56,7 @@ def import_articles_to_journal(request):
 
     for article in json_content:
 
-        section, created = models.Section.objects.language('en').get_or_create(
+        section, created = models.Section.objects.get_or_create(
             journal=request.journal,
             name=capfirst(article.get('type'))
         )
