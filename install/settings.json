@@ -1,0 +1,17 @@
+[
+  {
+    "group": {
+      "name": "plugin:eprints"
+    },
+    "setting": {
+      "description": "Enable eprints.",
+      "is_translatable": false,
+      "name": "eprints_enabled",
+      "pretty_name": "Enable eprints",
+      "type": "boolean"
+    },
+    "value": {
+      "default": ""
+    }
+  }
+]
